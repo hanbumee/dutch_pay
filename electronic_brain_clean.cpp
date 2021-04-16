@@ -39,7 +39,7 @@ int input_names(map<int, string> &name) {
     }
     return num;
 }
-
+/*
 void make_money_table(int **money_table, int totalPeople) {
     money_table = (int **)malloc(sizeof(int *) * totalPeople);
 
@@ -51,7 +51,7 @@ void make_money_table(int **money_table, int totalPeople) {
         }
     }
 }
-
+*/
 bool check_input_group(map<int, string> &name) {
 
     map<int, string>::iterator iter = name.begin();
@@ -72,7 +72,7 @@ bool check_input_group(map<int, string> &name) {
     } else return 1;
 }
 
-void input_who_spent_money(map<int, string> &name, int totalPeople, int** money_table){
+void input_who_spent_money(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table){
     cout << "\n\nwho spent money?";
     cout << "when you're done, type '!'" << endl << endl;
  
@@ -154,7 +154,7 @@ void input_who_spent_money(map<int, string> &name, int totalPeople, int** money_
 
 }
 
-void remove_cross(int **money_table, int totalPeople) {
+void remove_cross(vector<vector<int> > &money_table, int totalPeople) {
 
     for(int i = 0; i < totalPeople; i++){
         for(int j = 0; j < i; j++){
@@ -170,7 +170,7 @@ void remove_cross(int **money_table, int totalPeople) {
     
 }
 
-int find_first_sink(int **money_table, int totalPeople) {
+int find_first_sink(vector<vector<int> > &money_table, int totalPeople) {
     int sink;
     for(int i = 0; i < totalPeople; i++){
         int sum = 0;
@@ -182,7 +182,7 @@ int find_first_sink(int **money_table, int totalPeople) {
     return sink;
 }
 
-void print_money_table(map<int, string> &name, int totalPeople, int** money_table) {
+void print_money_table(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table) {
     for(int i = 0; i < totalPeople; i++){
         cout << " \t" << name[i];
     }
@@ -194,7 +194,7 @@ void print_money_table(map<int, string> &name, int totalPeople, int** money_tabl
     }cout<<endl;
 }
 
-int find_next_sink(map<int, string> &name, int totalPeople, int** money_table, vector<int> &sinkdone, int sink_passed_num, int nowsink) {
+int find_next_sink(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table, vector<int> &sinkdone, int sink_passed_num, int nowsink) {
     //find next sink;
     int nextsink;
     for(int i = 0; i < totalPeople; i++){// 마찬가지로 RACE condition 고려안됨
@@ -222,7 +222,7 @@ int find_next_sink(map<int, string> &name, int totalPeople, int** money_table, v
     return nextsink;
 }
 
-void remove_and_add_to_next_sink(int totalPeople, int** money_table, int nowsink, int nextsink, int sender) {
+void remove_and_add_to_next_sink(int totalPeople, vector<vector<int> > &money_table, int nowsink, int nextsink, int sender) {
     int money_to_now = money_table[sender][nowsink];
     money_table[sender][nowsink] = 0;
     int middle;
@@ -252,7 +252,7 @@ void remove_and_add_to_next_sink(int totalPeople, int** money_table, int nowsink
     }
 }
 
-bool is_reduce_done(int **money_table, int totalPeople) {
+bool is_reduce_done(vector<vector<int> > &money_table, int totalPeople) {
     //각 사람마다 송금횟수 count, 최종 완료(모든사람의 outcount가 1 이하) 인지 검사
     for(int i = 0; i < totalPeople; i++){
         int outcount = 0;//송금횟수
@@ -264,7 +264,7 @@ bool is_reduce_done(int **money_table, int totalPeople) {
     return 1;
 }
 
-int reduce_next_sink_table(map<int, string> &name, int totalPeople, int** money_table) {
+int reduce_next_sink_table(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table) {
     
     int sink = find_first_sink(money_table, totalPeople);
     int nowsink = sink;
@@ -297,7 +297,7 @@ int reduce_next_sink_table(map<int, string> &name, int totalPeople, int** money_
     return sink;
 }
 
-void print_result(map<int, string> &name, int totalPeople, int** money_table, int sink) {
+void print_result(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table, int sink) {
     cout << endl << endl;
     for(int i = 0; i < totalPeople; i++){
         if(i == sink) continue;
@@ -323,10 +323,8 @@ void print_result(map<int, string> &name, int totalPeople, int** money_table, in
 int main(){
 
     map<int, string> name;
-    int** money_table;
-
     int totalPeople = input_names(name);
-    make_money_table(money_table, totalPeople);
+    vector<vector<int> > money_table(totalPeople, vector<int>(totalPeople,0));
     if(!check_input_group(name)) return 0;
     input_who_spent_money(name, totalPeople, money_table);
 
@@ -336,10 +334,6 @@ int main(){
     int sink = reduce_next_sink_table(name, totalPeople, money_table);
 
     print_result(name, totalPeople, money_table, sink);
-    
-    for(int i = 0; i < totalPeople; i++) {
-        free(money_table[i]);
-    }free(money_table);
 
     return 0;
 }
