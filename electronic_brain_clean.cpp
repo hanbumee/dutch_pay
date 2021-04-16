@@ -155,6 +155,10 @@ void input_who_spent_money(map<int, string> &name, int totalPeople, vector<vecto
 }
 
 void remove_cross(vector<vector<int> > &money_table, int totalPeople) {
+    // A->B 5000
+    // B->A 3000 이면
+    // A->B 2000
+    // B->A 0으로 만들어 준다
 
     for(int i = 0; i < totalPeople; i++){
         for(int j = 0; j < i; j++){
@@ -223,6 +227,7 @@ int find_next_sink(map<int, string> &name, int totalPeople, vector<vector<int> >
 }
 
 void remove_and_add_to_next_sink(int totalPeople, vector<vector<int> > &money_table, int nowsink, int nextsink, int sender) {
+    //sink로 보내는 돈 우회시키기
     int money_to_now = money_table[sender][nowsink];
     money_table[sender][nowsink] = 0;
     int middle;
@@ -253,7 +258,8 @@ void remove_and_add_to_next_sink(int totalPeople, vector<vector<int> > &money_ta
 }
 
 bool is_reduce_done(vector<vector<int> > &money_table, int totalPeople) {
-    //각 사람마다 송금횟수 count, 최종 완료(모든사람의 outcount가 1 이하) 인지 검사
+    //그래프축소가 완료되었는지 검사
+    //각 사람마다 송금횟수를 세서 최종 완료(모든사람의 outcount가 1 이하) 인지 검사
     for(int i = 0; i < totalPeople; i++){
         int outcount = 0;//송금횟수
         for(int j = 0; j < totalPeople; j++){
@@ -265,7 +271,7 @@ bool is_reduce_done(vector<vector<int> > &money_table, int totalPeople) {
 }
 
 int reduce_next_sink_table(map<int, string> &name, int totalPeople, vector<vector<int> > &money_table) {
-    
+    //그래프를 축소시키는 전체적인 역할을 한다
     int sink = find_first_sink(money_table, totalPeople);
     int nowsink = sink;
     int nextsink;
@@ -324,7 +330,10 @@ int main(){
 
     map<int, string> name;
     int totalPeople = input_names(name);
+    
+    //money_table 사람사이에 보내는 돈의 그래프
     vector<vector<int> > money_table(totalPeople, vector<int>(totalPeople,0));
+    
     if(!check_input_group(name)) return 0;
     input_who_spent_money(name, totalPeople, money_table);
 
